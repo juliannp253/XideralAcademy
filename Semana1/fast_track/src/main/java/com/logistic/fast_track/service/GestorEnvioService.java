@@ -4,6 +4,10 @@ import com.logistic.fast_track.core.model.Envio;
 import com.logistic.fast_track.core.model.EnvioAereo;
 import com.logistic.fast_track.core.model.EnvioTerrestre;
 import com.logistic.fast_track.core.model.EtiquetaLogistica;
+import com.logistic.fast_track.core.strategy.EmbalajeEstandar;
+import com.logistic.fast_track.core.strategy.EmbalajeFragil;
+import com.logistic.fast_track.core.strategy.GestorConfiguracion;
+import com.logistic.fast_track.core.strategy.iEstrategiaEmbalaje;
 import com.logistic.fast_track.repository.EnvioRepository;
 import com.logistic.fast_track.repository.dto.EnvioRequestDTO;
 import org.springframework.stereotype.Service;
@@ -57,5 +61,27 @@ public class GestorEnvioService {
             java.util.Collections.sort(envios);
         }
         return envios;
+    }
+
+    public double cotizarEmbalaje(double peso, String tipoEmbalaje){
+        iEstrategiaEmbalaje estrategia;
+        if ("FRAGIL".equalsIgnoreCase(tipoEmbalaje)) {
+            estrategia = new EmbalajeFragil();
+        } else if ("ESTANDAR".equalsIgnoreCase(tipoEmbalaje)) {
+            estrategia = new EmbalajeEstandar();
+        } else {
+            // Clase anonima
+            estrategia = new iEstrategiaEmbalaje() {
+                @Override
+                public double calcularCostoCaja(double p) {
+                    return p * 50.0;
+                }
+            };
+        }
+
+        double costoBase = estrategia.calcularCostoCaja(peso);
+        double impuesto = GestorConfiguracion.getInstance().getImpuestoLocal();
+
+        return costoBase * impuesto;
     }
 }

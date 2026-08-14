@@ -1,5 +1,6 @@
 package com.logistic.fast_track.controller;
 
+import com.logistic.fast_track.controller.dto.CotizacionResponseDTO;
 import com.logistic.fast_track.core.model.Envio;
 import com.logistic.fast_track.core.model.EtiquetaLogistica;
 import com.logistic.fast_track.repository.dto.EnvioRequestDTO;
@@ -28,7 +29,7 @@ public class EnvioController {
         return new ResponseEntity<>(etiqueta, HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping("/listar")
     public ResponseEntity<List<Envio>> listarEnvios(
             @RequestParam(value = "orden", required = false, defaultValue = "fecha") String orden){
         List<Envio> envios = gestorEnvioService.obtenerTodosLosEnvios(orden);
@@ -36,5 +37,15 @@ public class EnvioController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(envios, HttpStatus.OK);
+    }
+
+    @GetMapping("/cotizar")
+    public ResponseEntity<CotizacionResponseDTO> cotizarEmbalaje(
+            @RequestParam double peso,
+            @RequestParam(defaultValue = "ESTANDAR") String tipoEmbalaje){
+        double costo = gestorEnvioService.cotizarEmbalaje(peso, tipoEmbalaje);
+        CotizacionResponseDTO respuesta = new CotizacionResponseDTO(peso, tipoEmbalaje.toUpperCase(), costo, "MXN");
+
+         return new ResponseEntity<>(respuesta, HttpStatus.OK);
     }
 }
