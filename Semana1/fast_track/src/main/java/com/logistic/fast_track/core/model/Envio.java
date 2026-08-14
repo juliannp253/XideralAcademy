@@ -1,14 +1,29 @@
 package com.logistic.fast_track.core.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "envios")
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Envio implements iRastreable, Comparable<Envio>{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected Long id;
     protected String idRastreo;
     protected double peso;
     protected LocalDate fechaCreacion;
     protected String estado;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "cliente_id")
     protected Cliente remitente; // HAS-A
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "direccion_id")
     protected Direccion destino; // HAS-A
+
+    protected Envio() {}
 
     public Envio(String idRastreo, double peso, LocalDate fechaCreacion, Cliente remitente, Direccion destino) {
         this.idRastreo = idRastreo;

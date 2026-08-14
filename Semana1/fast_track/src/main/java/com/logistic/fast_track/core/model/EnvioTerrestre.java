@@ -1,10 +1,17 @@
 package com.logistic.fast_track.core.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
 import java.time.LocalDate;
 
 // IS-A
+@Entity
+@Table(name = "envios_terrestre")
 public class EnvioTerrestre extends Envio{
     private String matriculaCamion;
+
+    protected EnvioTerrestre() {}
 
     public EnvioTerrestre(String idRastreo, double peso, LocalDate fechaCreacion,
                       Cliente remitente, Direccion destino, String matriculaCamion) {

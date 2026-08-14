@@ -1,11 +1,18 @@
 package com.logistic.fast_track.core.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
 import java.time.LocalDate;
 
 // IS-A
+@Entity
+@Table(name = "envios_aereos")
 public class EnvioAereo extends Envio{
     private String numeroVuelo;
     private String aerolinea;
+
+    protected EnvioAereo() {}
 
     public EnvioAereo(String idRastreo, double peso, LocalDate fechaCreacion,
                       Cliente remitente, Direccion destino, String aerolinea) {
