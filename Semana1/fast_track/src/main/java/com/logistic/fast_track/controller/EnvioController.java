@@ -1,12 +1,11 @@
 package com.logistic.fast_track.controller;
 
 import com.logistic.fast_track.core.model.EtiquetaLogistica;
+import com.logistic.fast_track.repository.dto.EnvioRequestDTO;
+import com.logistic.fast_track.service.GestorEnvioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,13 +13,17 @@ import java.util.UUID;
 @RestController
 @RequestMapping("api/v1/envios")
 public class EnvioController {
-    @PostMapping
-    public ResponseEntity<EtiquetaLogistica> crearEnvio(){
-        String idGenerado = "TRK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        String codigoBarras = "BARCODE-00200503";
 
-        EtiquetaLogistica nuevaEtiqueta = new EtiquetaLogistica(idGenerado, codigoBarras, LocalDateTime.now());
-        return new ResponseEntity<>(nuevaEtiqueta, HttpStatus.CREATED);
+    private final GestorEnvioService gestorEnvioService;
+
+    public EnvioController(GestorEnvioService gestorEnvioService){
+        this.gestorEnvioService = gestorEnvioService;
+    }
+
+    @PostMapping
+    public ResponseEntity<EtiquetaLogistica> crearEnvio(@RequestBody EnvioRequestDTO request){
+        EtiquetaLogistica etiqueta = gestorEnvioService.procesarNuevoEnvio(request);
+        return new ResponseEntity<>(etiqueta, HttpStatus.CREATED);
     }
 
     @GetMapping
