@@ -14,7 +14,8 @@ public abstract class Envio implements iRastreable, Comparable<Envio>{
     protected String idRastreo;
     protected double peso;
     protected LocalDate fechaCreacion;
-    protected String estado;
+    @Enumerated(EnumType.STRING)
+    protected EstadoEnvio estado;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "cliente_id")
@@ -31,11 +32,11 @@ public abstract class Envio implements iRastreable, Comparable<Envio>{
         this.fechaCreacion = fechaCreacion;
         this.remitente = remitente;
         this.destino = destino;
-        this.estado = "CREADO";
+        this.estado = EstadoEnvio.CREADO;
     }
 
     public abstract double calcularTiempoEstimado();
-    public abstract void actualizarEstado(String estado);
+    public abstract void actualizarEstado(EstadoEnvio estado);
 
     @Override
     public int compareTo(Envio otroEnvio){
@@ -55,10 +56,9 @@ public abstract class Envio implements iRastreable, Comparable<Envio>{
     public Cliente getRemitente() {
         return remitente;
     }
-    public String getEstado() { return estado; }
+    public EstadoEnvio getEstado() { return estado; }
     public Direccion getDestino() {
         return destino;
     }
-
 
 }

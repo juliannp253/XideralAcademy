@@ -47,6 +47,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Error Interno del Servidor",
                 "Ocurrió un error inesperado. Contacte a soporte.",
+                //ex.getMessage(), DESCOMENTAR PARA DEBUGGING
                 request.getRequestURI()
         );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);

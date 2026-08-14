@@ -2,6 +2,7 @@ package com.logistic.fast_track.controller;
 
 import com.logistic.fast_track.controller.dto.CotizacionResponseDTO;
 import com.logistic.fast_track.core.model.Envio;
+import com.logistic.fast_track.core.model.EstadoEnvio;
 import com.logistic.fast_track.core.model.EtiquetaLogistica;
 import com.logistic.fast_track.repository.dto.EnvioRequestDTO;
 import com.logistic.fast_track.service.GestorEnvioService;
@@ -46,5 +47,14 @@ public class EnvioController {
         CotizacionResponseDTO respuesta = new CotizacionResponseDTO(peso, tipoEmbalaje.toUpperCase(), costo, "MXN");
 
          return new ResponseEntity<>(respuesta, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{idRastreo}/estado")
+    public ResponseEntity<Envio> actualizarEstado(
+            @PathVariable String idRastreo,
+            @RequestParam EstadoEnvio nuevoEstado) {
+
+        Envio envioActualizado = gestorEnvioService.cambiarEstadoEnvio(idRastreo, nuevoEstado);
+        return ResponseEntity.ok(envioActualizado);
     }
 }

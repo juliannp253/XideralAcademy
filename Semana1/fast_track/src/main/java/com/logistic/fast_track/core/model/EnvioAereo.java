@@ -35,7 +35,7 @@ public class EnvioAereo extends Envio{
     }
 
     @Override
-    public void actualizarEstado(String estado) {
+    public void actualizarEstado(EstadoEnvio estado) {
         this.estado = estado;
     }
 

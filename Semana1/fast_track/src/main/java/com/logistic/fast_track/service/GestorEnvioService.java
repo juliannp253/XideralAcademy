@@ -1,10 +1,7 @@
 package com.logistic.fast_track.service;
 
 import com.logistic.fast_track.core.exception.ReglaNegocioException;
-import com.logistic.fast_track.core.model.Envio;
-import com.logistic.fast_track.core.model.EnvioAereo;
-import com.logistic.fast_track.core.model.EnvioTerrestre;
-import com.logistic.fast_track.core.model.EtiquetaLogistica;
+import com.logistic.fast_track.core.model.*;
 import com.logistic.fast_track.core.strategy.EmbalajeEstandar;
 import com.logistic.fast_track.core.strategy.EmbalajeFragil;
 import com.logistic.fast_track.core.strategy.GestorConfiguracion;
@@ -84,5 +81,20 @@ public class GestorEnvioService {
         double impuesto = GestorConfiguracion.getInstance().getImpuestoLocal();
 
         return costoBase * impuesto;
+    }
+
+    @Transactional
+    public Envio cambiarEstadoEnvio(String idRastreo, EstadoEnvio nuevoEstado) {
+        Envio envio = envioRepository.findByIdRastreo(idRastreo)
+                .orElseThrow(() -> new ReglaNegocioException("No se encontró el envío con ID: " + idRastreo));
+
+        if (!envio.getEstado().puedeTransicionarA(nuevoEstado)) {
+            throw new ReglaNegocioException(
+                    "Transición inválida. Un envío en estado " + envio.getEstado() + " no puede pasar a " + nuevoEstado
+            );
+        }
+
+        envio.actualizarEstado(nuevoEstado);
+        return envioRepository.save(envio);
     }
 }
