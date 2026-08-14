@@ -1,5 +1,6 @@
 package com.logistic.fast_track.controller;
 
+import com.logistic.fast_track.core.model.Envio;
 import com.logistic.fast_track.core.model.EtiquetaLogistica;
 import com.logistic.fast_track.repository.dto.EnvioRequestDTO;
 import com.logistic.fast_track.service.GestorEnvioService;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,7 +29,12 @@ public class EnvioController {
     }
 
     @GetMapping
-    public String ping(){
-        return "Servidor FastTrack inicializado";
+    public ResponseEntity<List<Envio>> listarEnvios(
+            @RequestParam(value = "orden", required = false, defaultValue = "fecha") String orden){
+        List<Envio> envios = gestorEnvioService.obtenerTodosLosEnvios(orden);
+        if (envios.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(envios, HttpStatus.OK);
     }
 }

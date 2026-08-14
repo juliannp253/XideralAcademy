@@ -11,7 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
+
 
 @Service
 public class GestorEnvioService {
@@ -43,5 +44,18 @@ public class GestorEnvioService {
 
         envioRepository.save(nuevoEnvio);
         return new EtiquetaLogistica(idRastreo, "BARCODE-" + idRastreo, LocalDateTime.now());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Envio> obtenerTodosLosEnvios(String orden){
+        List<Envio> envios = envioRepository.findAll();
+
+        if ("peso_desc".equalsIgnoreCase(orden)){
+            // Lambda + Comparator
+            envios.sort((e1, e2) -> Double.compare(e2.getPeso(), e1.getPeso()));
+        } else {
+            java.util.Collections.sort(envios);
+        }
+        return envios;
     }
 }
