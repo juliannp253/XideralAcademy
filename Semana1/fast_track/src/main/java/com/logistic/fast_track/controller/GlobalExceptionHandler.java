@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.logistic.fast_track.controller")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ReglaNegocioException.class)
