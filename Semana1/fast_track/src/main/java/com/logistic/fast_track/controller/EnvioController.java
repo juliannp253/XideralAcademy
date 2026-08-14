@@ -5,6 +5,7 @@ import com.logistic.fast_track.core.model.Envio;
 import com.logistic.fast_track.core.model.EtiquetaLogistica;
 import com.logistic.fast_track.repository.dto.EnvioRequestDTO;
 import com.logistic.fast_track.service.GestorEnvioService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class EnvioController {
     }
 
     @PostMapping
-    public ResponseEntity<EtiquetaLogistica> crearEnvio(@RequestBody EnvioRequestDTO request){
+    public ResponseEntity<EtiquetaLogistica> crearEnvio(@Valid @RequestBody EnvioRequestDTO request){
         EtiquetaLogistica etiqueta = gestorEnvioService.procesarNuevoEnvio(request);
         return new ResponseEntity<>(etiqueta, HttpStatus.CREATED);
     }

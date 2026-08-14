@@ -1,5 +1,6 @@
 package com.logistic.fast_track.service;
 
+import com.logistic.fast_track.core.exception.ReglaNegocioException;
 import com.logistic.fast_track.core.model.Envio;
 import com.logistic.fast_track.core.model.EnvioAereo;
 import com.logistic.fast_track.core.model.EnvioTerrestre;
@@ -43,7 +44,7 @@ public class GestorEnvioService {
                     dto.remitente(), dto.destino(), dto.matriculaCamion()
             );
         } else {
-            throw new IllegalArgumentException("Tipo de envío no permitido");
+            throw new ReglaNegocioException("Tipo de envío no permitido");
         }
 
         envioRepository.save(nuevoEnvio);
