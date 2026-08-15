@@ -1,9 +1,7 @@
 package com.logistic.fast_track.controller;
 
 import com.logistic.fast_track.controller.dto.CotizacionResponseDTO;
-import com.logistic.fast_track.core.model.Envio;
-import com.logistic.fast_track.core.model.EstadoEnvio;
-import com.logistic.fast_track.core.model.EtiquetaLogistica;
+import com.logistic.fast_track.core.model.*;
 import com.logistic.fast_track.repository.dto.EnvioRequestDTO;
 import com.logistic.fast_track.service.GestorEnvioService;
 import jakarta.validation.Valid;
@@ -56,5 +54,14 @@ public class EnvioController {
 
         Envio envioActualizado = gestorEnvioService.cambiarEstadoEnvio(idRastreo, nuevoEstado);
         return ResponseEntity.ok(envioActualizado);
+    }
+
+    @GetMapping("/lotes/aereos")
+    public ResponseEntity<LoteTransporte<EnvioAereo>> obtenerLoteVuelo(
+            @RequestParam(defaultValue = "10") int capacidad) {
+
+        LoteTransporte<EnvioAereo> lote = gestorEnvioService.armarLoteAereo(capacidad);
+
+        return ResponseEntity.ok(lote);
     }
 }

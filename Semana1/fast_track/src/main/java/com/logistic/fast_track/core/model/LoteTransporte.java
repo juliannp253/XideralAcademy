@@ -1,5 +1,8 @@
 package com.logistic.fast_track.core.model;
 
+import com.logistic.fast_track.core.exception.ReglaNegocioException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class LoteTransporte <T extends Envio>{
@@ -8,11 +11,12 @@ public class LoteTransporte <T extends Envio>{
 
     public LoteTransporte(int capacidadMaxima){
         this.capacidadMaxima = capacidadMaxima;
+        this.paquetes = new ArrayList<>();
     }
 
     public void cargarPaquetes(T paquete){
         if (paquetes.size() >= capacidadMaxima) {
-            throw new IllegalStateException("Lote de transporte lleno.");
+            throw new ReglaNegocioException("Lote de transporte lleno.");
         }
         paquetes.add(paquete);
     }

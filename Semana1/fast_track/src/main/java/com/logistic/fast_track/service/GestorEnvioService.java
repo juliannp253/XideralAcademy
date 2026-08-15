@@ -97,4 +97,21 @@ public class GestorEnvioService {
         envio.actualizarEstado(nuevoEstado);
         return envioRepository.save(envio);
     }
+
+    @Transactional(readOnly = true)
+    public LoteTransporte<EnvioAereo> armarLoteAereo(int capacidadMaxima) {
+
+        LoteTransporte<EnvioAereo> loteVuelo = new LoteTransporte<>(capacidadMaxima);
+
+        List<Envio> todosLosEnvios = envioRepository.findAll();
+
+        todosLosEnvios.stream()
+                .filter(envio -> envio instanceof EnvioAereo)
+                .filter(envio -> envio.getEstado() == EstadoEnvio.CREADO)
+                .map(envio -> (EnvioAereo) envio) // Casteo
+                .limit(capacidadMaxima)
+                .forEach(loteVuelo::cargarPaquetes); // Method reference
+
+        return loteVuelo;
+    }
 }
