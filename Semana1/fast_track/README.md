@@ -152,7 +152,7 @@ classDiagram
 
 ---
 
-## 🎯 Aplicación de la Rúbrica (Showcase Técnico)
+## 🎯 Aplicación de la Rúbrica
 A continuación, muestro en qué partes del código fuente implementé los requerimientos específicos:
 
 ### 1. Java Core y POO Avanzada
