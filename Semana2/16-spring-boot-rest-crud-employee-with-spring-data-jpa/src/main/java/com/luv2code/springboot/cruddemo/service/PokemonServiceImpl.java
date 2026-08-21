@@ -11,6 +11,7 @@ import java.util.Optional;
 @Service
 public class PokemonServiceImpl implements PokemonService {
 
+    /* Ya no se necesitan, Spring Data JPA realiza esto
     private PokemonRepository pokemonRepository;
 
     @Autowired
@@ -41,14 +42,14 @@ public class PokemonServiceImpl implements PokemonService {
     }
 
     @Override
-    public Pokemon save(Pokemon thePokemon) {
-        return pokemonRepository.save(thePokemon);
+    public Pokemon save(Pokemon theEmployee) {
+        return pokemonRepository.save(theEmployee);
     }
 
     @Override
     public void deleteById(int theId) {
         pokemonRepository.deleteById(theId);
-    }
+    }*/
 }
 
 

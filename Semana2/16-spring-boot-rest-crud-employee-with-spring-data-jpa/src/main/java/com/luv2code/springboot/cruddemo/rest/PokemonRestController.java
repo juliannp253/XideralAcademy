@@ -1,5 +1,6 @@
 package com.luv2code.springboot.cruddemo.rest;
 
+import com.luv2code.springboot.cruddemo.dao.PokemonRepository;
 import com.luv2code.springboot.cruddemo.service.PokemonService;
 import tools.jackson.databind.json.JsonMapper;
 import com.luv2code.springboot.cruddemo.entity.Pokemon;
@@ -8,25 +9,28 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 public class PokemonRestController {
 
     private PokemonService pokemonService;
+    private final PokemonRepository pokemonRepository;
 
     private JsonMapper jsonMapper;
 
     @Autowired
-    public PokemonRestController(PokemonService thePokemonService, JsonMapper theJsonMapper) {
-        pokemonService = thePokemonService;
-        jsonMapper = theJsonMapper;
+    public PokemonRestController(PokemonService thePokemonService, PokemonRepository pokemonRepository, JsonMapper theJsonMapper) {
+        this.pokemonService = thePokemonService;
+        this.pokemonRepository = pokemonRepository;
+        this.jsonMapper = theJsonMapper;
     }
 
     // expose "/pokemon" and return a list of employees
     @GetMapping("/pokemons")
     public List<Pokemon> findAll() {
-        return pokemonService.findAll();
+        return pokemonRepository.findAll();
     }
 
     // add mapping for GET /pokemons/{pokemonId}
@@ -34,11 +38,8 @@ public class PokemonRestController {
     @GetMapping("/pokemons/{pokemonId}")
     public Pokemon getPokemon(@PathVariable int pokemonId) {
 
-        Pokemon thePokemon = pokemonService.findById(pokemonId);
-
-        if (thePokemon == null) {
-            throw new RuntimeException("Pokemon id not found - " + pokemonId);
-        }
+        Pokemon thePokemon = pokemonRepository.findById(pokemonId)
+                .orElseThrow(() -> new RuntimeException("Pokemon id not found - " + pokemonId));
 
         return thePokemon;
     }
@@ -53,7 +54,7 @@ public class PokemonRestController {
 
         thePokemon.setId(0);
 
-        Pokemon dbPokemon = pokemonService.save(thePokemon);
+        Pokemon dbPokemon = pokemonRepository.save(thePokemon);
 
         return dbPokemon;
     }
@@ -63,7 +64,7 @@ public class PokemonRestController {
     @PutMapping("/pokemons")
     public Pokemon updatePokemon(@RequestBody Pokemon thePokemon) {
 
-        Pokemon dbPokemon = pokemonService.save(thePokemon);
+        Pokemon dbPokemon = pokemonRepository.save(thePokemon);
 
         return dbPokemon;
     }
@@ -76,11 +77,8 @@ public class PokemonRestController {
             @RequestBody Map<String, Object> patchPayload) {
 
         // Step 1: Retrieve the existing employee from database
-        Pokemon tempPokemon = pokemonService.findById(pokemonId);
-
-        if (tempPokemon == null) {
-            throw new RuntimeException("Pokemon id not found - " + pokemonId);
-        }
+        Pokemon tempPokemon = pokemonRepository.findById(pokemonId)
+                .orElseThrow(() -> new RuntimeException("Pokemon id not found - " + pokemonId));
 
         // Step 2: Security check - prevent ID modifications
         // The ID should never change, so reject any attempts to modify it
@@ -94,7 +92,7 @@ public class PokemonRestController {
         Pokemon patchedPokemon = jsonMapper.updateValue(tempPokemon, patchPayload);
 
         // Step 4: Save the updated pokemon to database and return it
-        Pokemon dbPokemon = pokemonService.save(patchedPokemon);
+        Pokemon dbPokemon = pokemonRepository.save(patchedPokemon);
 
         return dbPokemon;
     }
@@ -104,15 +102,10 @@ public class PokemonRestController {
     @DeleteMapping("/pokemons/{pokemonId}")
     public String deletePokemon(@PathVariable int pokemonId) {
 
-        Pokemon tempPokemon = pokemonService.findById(pokemonId);
+        Pokemon tempPokemon = pokemonRepository.findById(pokemonId)
+                .orElseThrow(() -> new RuntimeException("Pokemon id not found - " + pokemonId));
 
-        // throw exception if null
-
-        if (tempPokemon == null) {
-            throw new RuntimeException("Pokemon id not found - " + pokemonId);
-        }
-
-        pokemonService.deleteById(pokemonId);
+        pokemonRepository.deleteById(pokemonId);
 
         return "Deleted pokemon id - " + pokemonId;
     }
