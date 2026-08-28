@@ -1,0 +1,7 @@
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/02-spring-security/Spring-Security-Basic/src/main/java/com/luv2code/springboot/cruddemo/CruddemoApplication.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/02-spring-security/Spring-Security-Basic/src/main/java/com/luv2code/springboot/cruddemo/dao/PokemonRepository.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/02-spring-security/Spring-Security-Basic/src/main/java/com/luv2code/springboot/cruddemo/entity/Pokemon.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/02-spring-security/Spring-Security-Basic/src/main/java/com/luv2code/springboot/cruddemo/rest/PokemonRestController.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/02-spring-security/Spring-Security-Basic/src/main/java/com/luv2code/springboot/cruddemo/security/SecurityConfig.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/02-spring-security/Spring-Security-Basic/src/main/java/com/luv2code/springboot/cruddemo/service/PokemonService.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/02-spring-security/Spring-Security-Basic/src/main/java/com/luv2code/springboot/cruddemo/service/PokemonServiceImpl.java
