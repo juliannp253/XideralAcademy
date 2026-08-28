@@ -1,0 +1,21 @@
+[ {
+  "idTransaccion" : "TX1001",
+  "cuentaOrigen" : "CUENTA-5544",
+  "monto" : 1500.5,
+  "estado" : "APROBADA"
+}, {
+  "idTransaccion" : "TX1002",
+  "cuentaOrigen" : "CUENTA-8899",
+  "monto" : 320.0,
+  "estado" : "RECHAZADA"
+}, {
+  "idTransaccion" : "TX1003",
+  "cuentaOrigen" : "CUENTA-1122",
+  "monto" : 8950.0,
+  "estado" : "APROBADA"
+}, {
+  "idTransaccion" : "TX1004",
+  "cuentaOrigen" : "CUENTA-3344",
+  "monto" : 15.99,
+  "estado" : "PENDIENTE"
+} ]
