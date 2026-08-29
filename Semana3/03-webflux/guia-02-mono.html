@@ -1,0 +1,954 @@
+<meta charset="utf-8">
+<title>Tu primer Mono</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Zilla+Slab:wght@600;700&display=swap">
+<style>
+:root{
+  --bg:#f4f6f5;
+  --surface:#ffffff;
+  --surface-2:#eaeeec;
+  --ink:#12181a;
+  --ink-2:#4a5559;
+  --ink-3:#78848a;
+  --rule:#dbe2df;
+  --accent:#0e6b63;
+  --accent-soft:#dcedea;
+
+  --warn:#8a5a10;      --warn-bg:#f7eeda;
+  --next:#2f7d3a;      --next-bg:#e2f0e4;
+  --error:#b23a2e;     --error-bg:#f8e6e3;
+  --complete:#1f5b96;  --complete-bg:#e3edf8;
+
+  --term-bg:#101619;
+  --term-ink:#dbe4e6;
+  --term-dim:#7b8a8e;
+  --term-prompt:#5fb8ac;
+  --term-out:#a3b0b3;
+  --term-rule:#232d31;
+
+  --step:clamp(1.9rem,1.4rem + 1.6vw,2.6rem);
+  --h2:clamp(1.45rem,1.2rem + 1vw,1.9rem);
+  --h3:1.1rem;
+  --body:1rem;
+  --small:.87rem;
+  --tiny:.76rem;
+  --radius:10px;
+  --maxw:1180px;
+}
+
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1113;
+    --surface:#151b1e;
+    --surface-2:#1b2327;
+    --ink:#e6edee;
+    --ink-2:#9fadb0;
+    --ink-3:#78868a;
+    --rule:#242e32;
+    --accent:#5fc0b4;
+    --accent-soft:#122b29;
+
+    --warn:#dfa955;      --warn-bg:#2e2312;
+    --next:#69bf7a;      --next-bg:#152a1a;
+    --error:#e8908b;     --error-bg:#2f1a18;
+    --complete:#7fb0e8;  --complete-bg:#16243a;
+
+    --term-bg:#070a0c;
+    --term-ink:#dbe4e6;
+    --term-dim:#6c797d;
+    --term-prompt:#6fc9bc;
+    --term-out:#94a2a5;
+    --term-rule:#1d262a;
+  }
+}
+
+:root[data-theme="dark"]{
+  --bg:#0d1113;
+  --surface:#151b1e;
+  --surface-2:#1b2327;
+  --ink:#e6edee;
+  --ink-2:#9fadb0;
+  --ink-3:#78868a;
+  --rule:#242e32;
+  --accent:#5fc0b4;
+  --accent-soft:#122b29;
+
+  --warn:#dfa955;      --warn-bg:#2e2312;
+  --next:#69bf7a;      --next-bg:#152a1a;
+  --error:#e8908b;     --error-bg:#2f1a18;
+  --complete:#7fb0e8;  --complete-bg:#16243a;
+
+  --term-bg:#070a0c;
+  --term-ink:#dbe4e6;
+  --term-dim:#6c797d;
+  --term-prompt:#6fc9bc;
+  --term-out:#94a2a5;
+  --term-rule:#1d262a;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:var(--body);
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 1.5rem}
+
+/* ---------- masthead ---------- */
+.masthead{
+  border-bottom:1px solid var(--rule);
+  background:var(--surface);
+  padding:3.2rem 0 2.4rem;
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace;
+  font-size:var(--tiny);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 1rem;
+}
+.masthead h1{
+  font-family:"Zilla Slab",Georgia,serif;font-weight:700;
+  font-size:clamp(2.4rem,1.7rem + 3.2vw,4rem);
+  line-height:1.04;letter-spacing:-.015em;
+  margin:0 0 1.1rem;max-width:16ch;text-wrap:balance;
+}
+.lede{
+  font-size:clamp(1.02rem,.98rem + .35vw,1.2rem);
+  color:var(--ink-2);max-width:62ch;margin:0 0 1.6rem;
+}
+.facts{
+  list-style:none;display:flex;flex-wrap:wrap;gap:.45rem;margin:0;padding:0;
+}
+.facts li{
+  font-family:"JetBrains Mono",monospace;font-size:var(--tiny);
+  color:var(--ink-2);background:var(--surface-2);
+  border:1px solid var(--rule);border-radius:99px;padding:.28rem .7rem;
+}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:2.4rem;
+  padding-top:2.6rem;padding-bottom:5rem;
+}
+@media (min-width:1000px){
+  .shell{grid-template-columns:216px minmax(0,1fr);gap:3.4rem}
+}
+
+.toc{font-size:var(--small);align-self:start}
+@media (min-width:1000px){
+  .toc{position:sticky;top:1.6rem;max-height:calc(100vh - 3.2rem);overflow-y:auto}
+}
+.toc h2{
+  font-family:"JetBrains Mono",monospace;font-size:var(--tiny);font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
+  margin:0 0 .6rem;padding-bottom:.4rem;border-bottom:1px solid var(--rule);
+}
+.toc h2+*{margin-top:0}
+.toc ol,.toc ul{list-style:none;margin:0 0 1.6rem;padding:0;display:flex;flex-direction:column;gap:.08rem}
+.toc a{
+  display:flex;gap:.55rem;align-items:baseline;
+  color:var(--ink-2);text-decoration:none;
+  padding:.3rem .45rem;border-radius:6px;line-height:1.35;
+}
+.toc a:hover{color:var(--ink);background:var(--surface-2)}
+.toc a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.toc .n{
+  font-family:"JetBrains Mono",monospace;font-size:.7rem;
+  color:var(--ink-3);flex:none;
+}
+.toc a.cur{color:var(--ink);font-weight:600;background:var(--surface-2)}
+
+main{min-width:0;max-width:70ch}
+
+/* ---------- secciones ---------- */
+section{
+  padding-top:2.2rem;margin-top:2.2rem;border-top:1px solid var(--rule);
+}
+section:first-child{padding-top:0;margin-top:0;border-top:0}
+.rubric{
+  font-family:"JetBrains Mono",monospace;font-size:var(--tiny);
+  letter-spacing:.09em;text-transform:uppercase;color:var(--accent);
+  margin:0 0 .35rem;
+}
+h2.sec{
+  font-family:"Zilla Slab",Georgia,serif;font-weight:700;
+  font-size:var(--h2);line-height:1.14;letter-spacing:-.01em;
+  margin:0 0 1.1rem;display:flex;gap:.75rem;align-items:baseline;text-wrap:balance;
+}
+h2.sec .num{
+  font-family:"JetBrains Mono",monospace;font-size:.8rem;font-weight:700;
+  color:var(--ink-3);flex:none;
+}
+h3{
+  font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:var(--h3);
+  margin:2rem 0 .6rem;letter-spacing:-.005em;
+}
+p{margin:0 0 1rem;max-width:66ch}
+strong{font-weight:600}
+em{font-style:italic}
+a{color:var(--accent)}
+
+code{
+  font-family:"JetBrains Mono",monospace;font-size:.86em;
+  background:var(--surface-2);border:1px solid var(--rule);
+  border-radius:4px;padding:.08em .34em;
+}
+
+/* ---------- notas ---------- */
+.note{
+  background:var(--surface);border:1px solid var(--rule);
+  border-left:3px solid var(--accent);border-radius:var(--radius);
+  padding:.85rem 1.05rem;margin:0 0 1.2rem;font-size:var(--small);
+  color:var(--ink-2);max-width:66ch;
+}
+.note strong{color:var(--ink)}
+.note.warn{border-left-color:var(--warn);background:var(--warn-bg)}
+.note.warn strong{color:var(--ink)}
+.note.key{border-left-color:var(--accent);background:var(--accent-soft)}
+.note.key strong{color:var(--ink)}
+.note p:last-child{margin-bottom:0}
+
+/* ---------- analogía ---------- */
+.ana{
+  background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);
+  padding:1.1rem 1.2rem;margin:0 0 1.3rem;max-width:66ch;
+  position:relative;
+}
+.ana .tag{
+  font-family:"JetBrains Mono",monospace;font-size:.68rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--accent);
+  display:block;margin-bottom:.5rem;
+}
+.ana p:last-child{margin-bottom:0}
+.ana h4{
+  font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:1.05rem;
+  margin:0 0 .5rem;
+}
+
+/* ---------- terminal / código ---------- */
+.term{
+  background:var(--term-bg);border:1px solid var(--term-rule);
+  border-radius:var(--radius);margin:0 0 1.2rem;position:relative;overflow:hidden;
+}
+.term pre{
+  margin:0;padding:1rem 1.1rem;overflow-x:auto;
+  font-family:"JetBrains Mono",monospace;font-size:.8rem;line-height:1.72;
+  color:var(--term-ink);
+}
+.term code{background:none;border:0;padding:0;font-size:inherit;color:inherit}
+.term .cm{color:var(--term-dim)}
+.term .p{color:var(--term-prompt);user-select:none}
+.term .kw{color:#c99bd8}
+.term .ty{color:#7fc3e8}
+.term .st{color:#c8d98a}
+.term .out{color:var(--term-out)}
+.term .bad{color:#e8908b}
+.term .ok{color:#8ed49a}
+.term .lbl{
+  font-family:"JetBrains Mono",monospace;font-size:.66rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--term-dim);
+  padding:.55rem 1.1rem .1rem;display:block;
+}
+.copy{
+  position:absolute;top:.5rem;right:.5rem;z-index:2;
+  font-family:"JetBrains Mono",monospace;font-size:.66rem;
+  color:var(--term-dim);background:transparent;
+  border:1px solid var(--term-rule);border-radius:5px;
+  padding:.2rem .5rem;cursor:pointer;
+}
+.copy:hover{color:var(--term-ink);border-color:var(--term-dim)}
+.copy:focus-visible{outline:2px solid var(--term-prompt);outline-offset:1px}
+
+/* ---------- figuras ---------- */
+figure.flow{
+  background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);
+  padding:1.15rem 1.15rem .9rem;margin:0 0 1.4rem;overflow-x:auto;
+}
+figure.flow svg{display:block;width:100%;height:auto;color:var(--ink-2)}
+figure.flow figcaption{
+  font-family:"JetBrains Mono",monospace;font-size:var(--tiny);
+  color:var(--ink-3);line-height:1.55;margin-top:.85rem;
+}
+figure.flow figcaption strong{color:var(--ink-2)}
+
+figure.mapa{
+  background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);
+  padding:.85rem;margin:0 0 1.4rem;
+}
+figure.mapa img{display:block;width:100%;height:auto;border-radius:6px}
+figure.mapa figcaption{
+  font-family:"JetBrains Mono",monospace;font-size:var(--tiny);
+  color:var(--ink-3);line-height:1.55;margin-top:.8rem;
+}
+
+/* ---------- tablas ---------- */
+.tw{overflow-x:auto;margin:0 0 1.3rem;border:1px solid var(--rule);border-radius:var(--radius)}
+table{border-collapse:collapse;width:100%;font-size:var(--small);background:var(--surface)}
+th,td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{
+  font-family:"JetBrains Mono",monospace;font-size:.7rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  background:var(--surface-2);white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:0}
+td code{font-size:.8rem}
+
+/* ---------- señales ---------- */
+.sig{
+  font-family:"JetBrains Mono",monospace;font-size:.72rem;font-weight:700;
+  padding:.16rem .45rem;border-radius:5px;white-space:nowrap;
+}
+.sig.n{color:var(--next);background:var(--next-bg)}
+.sig.e{color:var(--error);background:var(--error-bg)}
+.sig.c{color:var(--complete);background:var(--complete-bg)}
+
+/* ---------- listas ---------- */
+ul.plain,ol.plain{margin:0 0 1.2rem;padding-left:1.15rem;max-width:66ch}
+ul.plain li,ol.plain li{margin-bottom:.45rem}
+
+ul.check{list-style:none;margin:0 0 1.3rem;padding:0;display:flex;flex-direction:column;gap:.4rem;max-width:66ch}
+ul.check li{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:.6rem;align-items:start;
+  background:var(--surface);border:1px solid var(--rule);border-radius:8px;
+  padding:.6rem .8rem;font-size:var(--small);
+}
+ul.check .box{font-family:"JetBrains Mono",monospace;color:var(--ink-3);flex:none}
+ul.check b{display:block;margin-bottom:.1rem;font-size:.95rem;color:var(--ink)}
+
+/* ---------- trampa ---------- */
+.trap{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:.85rem;align-items:start;
+  background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);
+  padding:.85rem 1rem;margin-bottom:.55rem;font-size:var(--small);max-width:66ch;
+}
+.trap .k{
+  font-family:"JetBrains Mono",monospace;font-size:.72rem;font-weight:700;
+  color:var(--error);background:var(--error-bg);
+  border-radius:5px;padding:.22rem .5rem;white-space:nowrap;
+}
+.trap b{display:block;margin-bottom:.15rem;font-size:.95rem;color:var(--ink)}
+
+/* ---------- glosario ---------- */
+dl.glos{margin:0 0 1.3rem;max-width:66ch}
+dl.glos dt{
+  font-family:"JetBrains Mono",monospace;font-size:.8rem;font-weight:700;
+  color:var(--accent);margin-top:.9rem;
+}
+dl.glos dd{margin:.15rem 0 0;font-size:var(--small);color:var(--ink-2)}
+
+/* ---------- cierre ---------- */
+.closing{
+  border-top:1px solid var(--rule);margin-top:3rem;padding-top:1.6rem;
+  font-size:var(--small);color:var(--ink-3);
+}
+.closing a{color:var(--ink-2)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+}
+html{scroll-behavior:smooth}
+</style>
+<style>
+/* ---------- añadidos de las guías de laboratorio ---------- */
+.paso{
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:.85rem;align-items:start;
+  background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);
+  padding:.85rem 1rem;margin-bottom:.55rem;font-size:var(--small);max-width:66ch;
+}
+.paso .k{
+  font-family:"JetBrains Mono",monospace;font-size:.72rem;font-weight:700;
+  color:var(--accent);background:var(--accent-soft);
+  border-radius:5px;padding:.22rem .5rem;white-space:nowrap;
+}
+.paso b{display:block;margin-bottom:.15rem;font-size:.95rem;color:var(--ink)}
+.ver{
+  border-left:3px solid var(--next);background:var(--next-bg);
+  border-radius:0 var(--radius) var(--radius) 0;
+  padding:.75rem 1rem;margin:0 0 1.2rem;font-size:var(--small);max-width:66ch;
+}
+.ver b{
+  display:block;font-family:"JetBrains Mono",monospace;font-size:.68rem;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--next);margin-bottom:.3rem;
+}
+.ver p:last-child{margin-bottom:0}
+.arch{
+  font-family:"JetBrains Mono",monospace;font-size:.78rem;line-height:1.75;
+  background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);
+  padding:.9rem 1.1rem;margin:0 0 1.3rem;overflow-x:auto;color:var(--ink-2);
+}
+.arch .dir{color:var(--accent);font-weight:500}
+.arch .hi{color:var(--ink);font-weight:600}
+.arch .cm{color:var(--ink-3)}
+figure.shot{
+  margin:0 0 1.4rem;background:var(--surface);
+  border:1px solid var(--rule);border-radius:var(--radius);padding:.85rem;
+}
+figure.shot img{display:block;width:100%;height:auto;border-radius:6px}
+figure.shot figcaption{
+  font-family:"JetBrains Mono",monospace;font-size:var(--tiny);
+  color:var(--ink-3);line-height:1.55;margin-top:.75rem;
+}
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">Spring Boot 4.1 &middot; Java 21 &middot; Laboratorio WebFlux &middot; 01 de 02</p>
+    <h1>Tu primer Mono</h1>
+    <p class="lede">Vas a construir la misma API de empleados del proyecto 15, pero devolviendo <code>Mono&lt;Employee&gt;</code> en lugar de <code>Employee</code>. Casi no cambia el código. Cambia todo lo demás — y al final vas a medirlo con un cronómetro.</p>
+    <ul class="facts">
+      <li>~60 min</li>
+      <li>Java 21</li>
+      <li>Sin base de datos</li>
+      <li>Sin Docker</li>
+      <li>localhost:8074</li>
+    </ul>
+  </div>
+</header>
+
+<div class="wrap shell">
+
+<nav class="toc" aria-label="Contenido">
+  <h2>La ruta</h2>
+  <ol>
+    <li><a href="#empezar"><span class="n">00</span> Poner en marcha</a></li>
+    <li><a href="#crear"><span class="n">01</span> Crear el proyecto</a></li>
+    <li><a href="#datos"><span class="n">02</span> Los datos y la latencia</a></li>
+    <li><a href="#controlador"><span class="n">03</span> El controlador</a></li>
+    <li><a href="#vacio"><span class="n">04</span> El vacío no es un error</a></li>
+    <li><a href="#error"><span class="n">05</span> El canal de error</a></li>
+    <li><a href="#hilos"><span class="n">06</span> ¿Quién te atiende?</a></li>
+    <li><a href="#test"><span class="n">07</span> Donde se entiende de verdad</a></li>
+    <li><a href="#laboratorio"><span class="n">08</span> El experimento</a></li>
+  </ol>
+  <h2>Referencia</h2>
+  <ul>
+    <li><a href="#errores">Si algo falla</a></li>
+    <li><a href="#ejercicios">Ejercicios</a></li>
+  </ul>
+  <h2>La serie</h2>
+  <ul>
+    <li><a href="https://claude.ai/code/artifact/cf77325b-1c3a-470f-b87c-41b11c0e1c83"><span class="n">00</span> Las cuatro ideas</a></li>
+    <li><a href="https://claude.ai/code/artifact/f9233b9b-b0ca-4382-8c96-80f64b66c173"><span class="n">01</span> Pensar en flujos</a></li>
+    <li><a href="https://claude.ai/code/artifact/d2f86aa6-7c6e-4a49-a1e2-5997273b51a4"><span class="n">··</span> Fe de erratas</a></li>
+    <li><a href="#empezar" class="cur"><span class="n">02</span> Lab · Mono</a></li>
+    <li><a href="https://claude.ai/code/artifact/4eae07f8-6023-49d3-b132-d52de9b79fb2"><span class="n">03</span> Lab · Flux</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<section id="empezar">
+  <p class="rubric">Antes de empezar</p>
+  <h2 class="sec"><span class="num">00</span> Poner en marcha</h2>
+
+  <ul class="check">
+    <li><span class="box">[ ]</span><span><b>Java 21 o superior</b> <code>java -version</code> debe decir <code>21</code> o más.</span></li>
+    <li><span class="box">[ ]</span><span><b>Haber leído la guía de conceptos</b> — <a href="https://claude.ai/code/artifact/f9233b9b-b0ca-4382-8c96-80f64b66c173">Pensar en flujos</a>. Aquí se da por sabido qué es push, qué son los tres canales y qué es un <code>Mono</code>.</span></li>
+    <li><span class="box">[ ]</span><span><b>Nada más</b> No hay Docker, ni MySQL, ni Mongo, ni contraseñas. A propósito: lo difícil de este tema es el concepto, no la instalación.</span></li>
+  </ul>
+
+  <p>Si solo quieres verlo funcionar antes de escribir nada:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="p">$</span> <span class="cmd">cd proyectos/01-webflux-mono</span>
+<span class="p">$</span> <span class="cmd">./mvnw spring-boot:run</span>
+<span class="out ok">Netty started on port 8074 (http)</span>
+<span class="out">Started WebfluxMonoApplication in 1.08 seconds</span>
+
+<span class="cm"># en otra terminal</span>
+<span class="p">$</span> <span class="cmd">./scripts/probar.sh</span></code></pre>
+  </div>
+
+  <p class="note"><strong>Fíjate ya en una cosa.</strong> Dice <code>Netty started</code>, no <code>Tomcat started</code>. WebFlux no usa Tomcat: usa Netty, un servidor construido sobre un <em>event loop</em> de pocos hilos. Ese cambio de servidor es la mitad de la historia.</p>
+</section>
+
+<section id="crear">
+  <p class="rubric">El andamiaje</p>
+  <h2 class="sec"><span class="num">01</span> Crear el proyecto</h2>
+
+  <p>En <a href="https://start.spring.io">start.spring.io</a>, o desde Eclipse con <em>Spring Starter Project</em>:</p>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>Project</td><td>Maven</td></tr>
+      <tr><td>Spring Boot</td><td>la <code>4.1.x</code> más reciente que ofrezca el desplegable</td></tr>
+      <tr><td>Group</td><td><code>com.academymty</code></td></tr>
+      <tr><td>Artifact</td><td><code>webflux-mono</code></td></tr>
+      <tr><td>Java</td><td><code>21</code></td></tr>
+      <tr><td>Dependencies</td><td><strong>Spring Reactive Web</strong> (eso es WebFlux)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Con marcar <strong>Spring Reactive Web</strong> ya tienes todo: ese starter arrastra Reactor, Netty y Jackson, y su gemelo de test arrastra JUnit y <code>reactor-test</code>. No añadas nada más.</p>
+
+  <p class="note warn"><strong>Dos cambios de Spring Boot 4</strong> que no estaban en Boot 3 y que confunden si vienes de un tutorial antiguo:</p>
+
+  <div class="trap">
+    <span class="k">1</span>
+    <span><b>El starter se llama <code>spring-boot-starter-webflux</code></b>Si por costumbre pones <code>spring-boot-starter-web</code> te llevas Spring MVC y Tomcat, o directamente un artefacto que ya no existe: en Boot 4 el de MVC pasó a llamarse <code>spring-boot-starter-webmvc</code>.</span>
+  </div>
+  <div class="trap">
+    <span class="k">2</span>
+    <span><b>Jackson cambió de casa</b>Boot 4 usa <strong>Jackson 3</strong>, que vive en <code>tools.jackson.core</code> en vez de <code>com.fasterxml.jackson.core</code>. No tienes que declararlo — <code>spring-boot-starter-webflux</code> lo trae— pero si copias de un tutorial un <code>import com.fasterxml…</code> para configurar el <code>ObjectMapper</code>, no va a compilar.</span>
+  </div>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+    <span class="lbl">pom.xml — las dependencias que importan</span>
+<pre><code><span class="cm">&lt;!-- Reactor (Mono/Flux) + Netty + Jackson. Con esto basta. --&gt;</span>
+&lt;<span class="ty">dependency</span>&gt;
+    &lt;groupId&gt;<span class="st">org.springframework.boot</span>&lt;/groupId&gt;
+    &lt;artifactId&gt;<span class="st">spring-boot-starter-webflux</span>&lt;/artifactId&gt;
+&lt;/<span class="ty">dependency</span>&gt;
+
+<span class="cm">&lt;!-- JUnit + reactor-test (StepVerifier, sección 07). Tampoco hay que --&gt;</span>
+<span class="cm">&lt;!-- pedir nada más: reactor-test viene dentro de este starter.        --&gt;</span>
+&lt;<span class="ty">dependency</span>&gt;
+    &lt;groupId&gt;<span class="st">org.springframework.boot</span>&lt;/groupId&gt;
+    &lt;artifactId&gt;<span class="st">spring-boot-starter-webflux-test</span>&lt;/artifactId&gt;
+    &lt;scope&gt;<span class="st">test</span>&lt;/scope&gt;
+&lt;/<span class="ty">dependency</span>&gt;</code></pre>
+  </div>
+
+  <p>Y en <code>application.properties</code>, solo el puerto (el 8074 está libre en el mapa de puertos del curso):</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code>spring.application.name=webflux-mono
+server.port=8074
+
+<span class="cm"># Deja ver el nombre del hilo en cada línea de log — lo usaremos en la §06</span>
+logging.pattern.console=%clr(%d{HH:mm:ss.SSS}){faint} %clr(%-5level) %clr([%15.15t]){magenta} %clr(%-40.40logger{39}){cyan} : %msg%n</code></pre>
+  </div>
+
+  <p>Al terminar la guía tendrás esto:</p>
+
+  <div class="arch">
+<span class="dir">01-webflux-mono/</span>
+├── pom.xml
+├── <span class="dir">scripts/</span>
+│   ├── probar.sh        <span class="cm">← recorrido por los endpoints</span>
+│   └── comparar.sh      <span class="cm">← el experimento de la §08</span>
+└── <span class="dir">src/main/java/com/academymty/webflux/mono/</span>
+    ├── WebfluxMonoApplication.java
+    ├── <span class="dir">model/</span>     <span class="hi">Employee.java</span>            <span class="cm">record</span>
+    ├── <span class="dir">repo/</span>      <span class="hi">EmployeeRepository.java</span>  <span class="cm">Map + latencia simulada</span>
+    └── <span class="dir">rest/</span>      <span class="hi">EmployeeRestController.java</span>
+               <span class="hi">BloqueanteRestController.java</span>  <span class="cm">← lo que NO hay que hacer</span>
+               <span class="hi">HiloRestController.java</span></div>
+</section>
+
+<section id="datos">
+  <p class="rubric">Los datos</p>
+  <h2 class="sec"><span class="num">02</span> Los datos y la latencia</h2>
+
+  <p>El <code>Employee</code> es un <code>record</code>: inmutable, sin <em>setters</em>. Encaja con el estilo funcional del que hablaba la guía de conceptos — si nadie puede modificarlo, no hace falta sincronizar nada aunque lo toquen varios hilos.</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+    <span class="lbl">model/Employee.java</span>
+<pre><code><span class="kw">public record</span> <span class="ty">Employee</span>(<span class="kw">int</span> id, <span class="ty">String</span> firstName, <span class="ty">String</span> lastName, <span class="ty">String</span> email) { }</code></pre>
+  </div>
+
+  <p>El repositorio no habla con ninguna base de datos: los datos están en un <code>Map</code>. Pero simula <strong>lo único que nos importa de una base de datos real: que tarda</strong>.</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+    <span class="lbl">repo/EmployeeRepository.java — el corazón del proyecto</span>
+<pre><code><span class="kw">public static final</span> <span class="ty">Duration</span> LATENCIA = <span class="ty">Duration</span>.ofMillis(<span class="st">5000</span>);
+
+<span class="cm">// ── versión reactiva ──────────────────────────────────────</span>
+<span class="kw">public</span> <span class="ty">Mono</span>&lt;<span class="ty">Employee</span>&gt; findById(<span class="kw">int</span> id) {
+    <span class="kw">return</span> <span class="ty">Mono</span>.justOrEmpty(tabla.get(id))   <span class="cm">// si no está → Mono vacío</span>
+               .delayElement(LATENCIA);      <span class="cm">// "la base de datos tarda"</span>
+}
+
+<span class="cm">// ── versión bloqueante (para el experimento de la §08) ────</span>
+<span class="kw">public</span> <span class="ty">Employee</span> findByIdBloqueante(<span class="kw">int</span> id) {
+    <span class="ty">Thread</span>.sleep(LATENCIA.toMillis());     <span class="cm">// el hilo se DUERME</span>
+    <span class="kw">return</span> tabla.get(id);
+}</code></pre>
+  </div>
+
+  <p class="note key"><strong>Las dos tardan 5 segundos. Esa es la clave del experimento final.</strong> No vamos a comparar una lenta con una rápida: vamos a comparar dos que tardan <em>exactamente lo mismo</em>. Lo único que cambia es si el hilo se queda esperando o se va a atender a otro. Guarda esa frase para la §08.</p>
+
+  <p>Y fíjate en lo que <strong>no</strong> pasa al llamar a <code>findById()</code>: no se busca nada, no se espera nada. Devuelve un <code>Mono</code> y el método termina de inmediato. Es <em>la receta</em>.</p>
+</section>
+
+<section id="controlador">
+  <p class="rubric">El código</p>
+  <h2 class="sec"><span class="num">03</span> El controlador</h2>
+
+  <p>Aquí está la traducción completa desde el proyecto 15. Míralas juntas:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+    <span class="lbl">antes y después</span>
+<pre><code><span class="cm">// ── Proyecto 15 · Spring MVC ──────────────────────────────</span>
+<span class="kw">@GetMapping</span>(<span class="st">"/employees/{id}"</span>)
+<span class="kw">public</span> <span class="ty">Employee</span> findById(<span class="kw">@PathVariable</span> <span class="kw">int</span> id) {
+    <span class="kw">return</span> service.findById(id);        <span class="cm">// el hilo espera AQUÍ 5 segundos</span>
+}
+
+<span class="cm">// ── Proyecto 01 · WebFlux ─────────────────────────────────</span>
+<span class="kw">@GetMapping</span>(<span class="st">"/employees/{id}"</span>)
+<span class="kw">public</span> <span class="ty">Mono</span>&lt;<span class="ty">Employee</span>&gt; findById(<span class="kw">@PathVariable</span> <span class="kw">int</span> id) {
+    <span class="kw">return</span> repo.findById(id)             <span class="cm">// devuelve el plan y suelta el hilo</span>
+               .switchIfEmpty(<span class="ty">Mono</span>.error(<span class="kw">new</span> <span class="ty">ResponseStatusException</span>(
+                       <span class="ty">HttpStatus</span>.NOT_FOUND, <span class="st">"No existe el empleado "</span> + id)));
+}</code></pre>
+  </div>
+
+  <p><strong>Una palabra de diferencia en la firma.</strong> El cuerpo es el mismo. Lo que cambia es quién espera: en MVC espera tu hilo; en WebFlux no espera nadie, porque Spring se suscribe y suelta el hilo hasta que el dato esté.</p>
+
+  <p>Arráncalo y pruébalo:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="p">$</span> <span class="cmd">curl -s -w '\n%{time_total}s\n' http://localhost:8074/api/employees/1</span>
+<span class="out">{"id":1,"firstName":"Leslie","lastName":"Andrews","email":"leslie@luv2code.com"}</span>
+<span class="out ok">5.017419s</span></code></pre>
+  </div>
+
+  <div class="ver">
+    <b>Qué deberías ver</b>
+    <p>El JSON de siempre, y unos <strong>5 segundos</strong> — la latencia que simulamos. Idéntico a lo que devolvía el proyecto 15. <em>Y eso es exactamente el problema pedagógico de esta guía:</em> con una sola petición, WebFlux y MVC son indistinguibles. La diferencia no aparece hasta la §08.</p>
+  </div>
+</section>
+
+<section id="vacio">
+  <p class="rubric">La primera sorpresa</p>
+  <h2 class="sec"><span class="num">04</span> El vacío no es un error</h2>
+
+  <p>Casi todo el mundo da por hecho que si el <code>Mono</code> viene vacío, Spring devuelve un <code>404</code>. Vamos a comprobarlo. Añade este endpoint, que es igual que el anterior pero <strong>sin</strong> <code>switchIfEmpty</code>:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="kw">@GetMapping</span>(<span class="st">"/employees-suave/{id}"</span>)
+<span class="kw">public</span> <span class="ty">Mono</span>&lt;<span class="ty">Employee</span>&gt; findByIdSuave(<span class="kw">@PathVariable</span> <span class="kw">int</span> id) {
+    <span class="kw">return</span> repo.findById(id);        <span class="cm">// sin switchIfEmpty</span>
+}</code></pre>
+  </div>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="p">$</span> <span class="cmd">curl -i http://localhost:8074/api/employees-suave/999</span>
+<span class="out bad">HTTP/1.1 200 OK</span>
+<span class="out">content-length: 0</span>
+
+<span class="cm"># …y ahora el que SÍ lleva switchIfEmpty:</span>
+<span class="p">$</span> <span class="cmd">curl -i http://localhost:8074/api/employees/999</span>
+<span class="out ok">HTTP/1.1 404 Not Found</span>
+<span class="out">{"timestamp":"…","path":"/api/employees/999","status":404,</span>
+<span class="out"> "error":"Not Found","requestId":"…","message":"No existe el empleado 999"}</span></code></pre>
+  </div>
+
+  <p class="note warn"><strong><code>200 OK</code> con el cuerpo vacío.</strong> No <code>404</code>. Y no es un fallo de Spring: es coherente con lo que aprendiste en la guía de conceptos. Un <code>Mono</code> vacío es un flujo que hizo <code>onComplete</code> <strong>sin ningún <code>onNext</code></strong>, y eso es un <em>final feliz</em>. En el modelo reactivo, <strong>“no hay nada” no es un error</strong> — es una respuesta legítima.</p>
+
+  <p>Si quieres un <code>404</code>, tienes que pedirlo. Eso es lo que hace <code>switchIfEmpty()</code>: “si el flujo termina sin emitir, cámbialo por este otro” — y ese otro es un <code>Mono.error(...)</code>.</p>
+</section>
+
+<section id="error">
+  <p class="rubric">El tercer canal</p>
+  <h2 class="sec"><span class="num">05</span> El canal de error</h2>
+
+  <p>Ahora vas a manejar un error <strong>sin un solo <code>try/catch</code></strong>. Este endpoint truena a propósito y se recupera solo:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="kw">@GetMapping</span>(<span class="st">"/employees/{id}/boom"</span>)
+<span class="kw">public</span> <span class="ty">Mono</span>&lt;<span class="ty">Employee</span>&gt; boom(<span class="kw">@PathVariable</span> <span class="kw">int</span> id) {
+    <span class="kw">return</span> repo.findById(id)
+               .flatMap(e -> <span class="ty">Mono</span>.&lt;<span class="ty">Employee</span>&gt;error(<span class="kw">new</span> <span class="ty">IllegalStateException</span>(<span class="st">"truena"</span>)))
+               .onErrorResume(ex -> {                 <span class="cm">// ← aquí está tu catch</span>
+                   log.warn(<span class="st">"me lo comí: {}"</span>, ex.getMessage());
+                   <span class="kw">return</span> <span class="ty">Mono</span>.just(<span class="kw">new</span> <span class="ty">Employee</span>(-<span class="st">1</span>, <span class="st">"Plan"</span>, <span class="st">"B"</span>, <span class="st">"fallback@academymty.mx"</span>));
+               });
+}</code></pre>
+  </div>
+
+  <div class="ver">
+    <b>Qué deberías ver</b>
+    <p><code>{"id":-1,"firstName":"Plan","lastName":"B",…}</code> con un <code>200</code>. El error ocurrió de verdad — lo ves en el log del servidor— pero <code>onErrorResume</code> lo sustituyó por un valor de repuesto <em>dentro del flujo</em>, y el cliente ni se enteró.</p>
+  </div>
+
+  <p>Esto es lo que la guía de conceptos llamaba “el error es un ciudadano de primera clase”. Como viaja por el flujo y no por la pila de llamadas, puedes aplicarle operadores: sustituirlo (<code>onErrorResume</code>), reintentarlo con espera creciente (<code>retryWhen</code>), o cambiar de fuente. Con <code>try/catch</code> solo puedes atraparlo y decidir ahí mismo.</p>
+
+  <p>Y un tipo que no existe en el mundo bloqueante:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="kw">@DeleteMapping</span>(<span class="st">"/employees/{id}"</span>)
+<span class="kw">public</span> <span class="ty">Mono</span>&lt;<span class="ty">Void</span>&gt; delete(<span class="kw">@PathVariable</span> <span class="kw">int</span> id) {
+    <span class="kw">return</span> repo.findById(id).then();   <span class="cm">// then() tira el valor, deja la señal de fin</span>
+}</code></pre>
+  </div>
+
+  <p><code>Mono&lt;Void&gt;</code> es “no te devuelvo nada, pero te aviso cuando haya terminado”. Es el <code>void</code> reactivo — y a diferencia de un <code>void</code> normal, <strong>sí puedes esperarlo</strong>.</p>
+</section>
+
+<section id="hilos">
+  <p class="rubric">La prueba</p>
+  <h2 class="sec"><span class="num">06</span> ¿Quién te atiende?</h2>
+
+  <p>Hasta aquí todo ha sido igual que MVC. Esta es la primera evidencia real de que algo cambió por debajo:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="p">$</span> <span class="cmd">for i in 1 2 3 4 5; do curl -s localhost:8074/api/hilo | cut -d, -f1; done</span>
+<span class="out">{"hilo":"reactor-http-nio-8"</span>
+<span class="out">{"hilo":"reactor-http-nio-9"</span>
+<span class="out">{"hilo":"reactor-http-nio-1"</span>
+<span class="out">{"hilo":"reactor-http-nio-10"</span>
+<span class="out">{"hilo":"reactor-http-nio-2"</span></code></pre>
+  </div>
+
+  <div class="ver">
+    <b>Qué deberías ver</b>
+    <p>Nombres <code>reactor-http-nio-N</code> que <strong>se repiten</strong>. Si haces 100 peticiones no verás 100 hilos: verás los mismos pocos, tantos como núcleos tenga tu máquina. <strong>Eso es el event loop.</strong></p>
+    <p>En el proyecto 15, con Tomcat, verías <code>http-nio-8080-exec-1</code>, <code>-exec-2</code>, <code>-exec-3</code>… uno distinto por petición, hasta 200.</p>
+  </div>
+
+  <p class="note warn"><strong>Y de aquí sale la regla de oro.</strong> Si solo tienes 8 hilos para atender <em>todo</em> el tráfico, <strong>ninguno puede pararse jamás</strong>. Un <code>Thread.sleep()</code>, una consulta JDBC o un <code>RestTemplate</code> escondidos en un <code>map()</code> no ralentizan una petición: <strong>congelan el servidor entero</strong>. Es exactamente lo que vas a medir en la §08.</p>
+</section>
+
+<section id="test">
+  <p class="rubric">El momento clave</p>
+  <h2 class="sec"><span class="num">07</span> Donde se entiende de verdad</h2>
+
+  <p>En el controlador nunca notas que un <code>Mono</code> es una receta, porque Spring se suscribe por ti. En un test no hay nadie que lo haga — y ahí cae la ficha:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+    <span class="lbl">src/test/java/…/EmployeeRepositoryTest.java</span>
+<pre><code><span class="kw">@Test</span>
+<span class="kw">void</span> sinSubscribeNoPasaNada() {
+    <span class="ty">AtomicBoolean</span> seEjecuto = <span class="kw">new</span> <span class="ty">AtomicBoolean</span>(<span class="kw">false</span>);
+
+    <span class="ty">Mono</span>&lt;<span class="ty">String</span>&gt; receta = <span class="ty">Mono</span>.fromCallable(() -> {
+        seEjecuto.set(<span class="kw">true</span>);
+        <span class="kw">return</span> <span class="st">"cocinado"</span>;
+    });
+
+    <span class="cm">// Ya construimos el Mono. ¿Se ejecutó el código de dentro?</span>
+    assertFalse(seEjecuto.get());     <span class="cm">// ← NO. Es la receta, no el plato.</span>
+
+    receta.block();                   <span class="cm">// block() se suscribe y espera</span>
+
+    assertTrue(seEjecuto.get());      <span class="cm">// ← ahora sí</span>
+}</code></pre>
+  </div>
+
+  <p class="note key"><strong>Este test es la guía entera en veinte líneas.</strong> Construir el <code>Mono</code> no ejecuta nada. Ni una consulta, ni una petición HTTP, ni un <code>println</code>. Todo espera a que alguien se suscriba. Cuando alguien te diga “mi código reactivo no hace nada y no marca error”, es esto el 90 % de las veces.</p>
+
+  <h3>StepVerifier: cómo se testea de verdad</h3>
+
+  <p><code>.block()</code> vale para demostrar el punto, pero no es la forma correcta. La herramienta es <code>StepVerifier</code>, y lee casi como una frase — porque comprueba las <strong>señales</strong> que estudiaste en la guía de conceptos:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="kw">@Test</span>
+<span class="kw">void</span> empleadoQueExiste() {
+    <span class="ty">StepVerifier</span>.create(repo.findById(<span class="st">1</span>))
+            .assertNext(e -> assertEquals(<span class="st">"Leslie"</span>, e.firstName()))   <span class="cm">// onNext</span>
+            .verifyComplete();                                        <span class="cm">// onComplete</span>
+}
+
+<span class="kw">@Test</span>
+<span class="kw">void</span> empleadoQueNoExiste() {
+    <span class="ty">StepVerifier</span>.create(repo.findById(<span class="st">999</span>))
+            .verifyComplete();      <span class="cm">// cero onNext, directo a onComplete ← la §04</span>
+}
+
+<span class="kw">@Test</span>
+<span class="kw">void</span> elErrorEsUnaSenal() {
+    <span class="ty">StepVerifier</span>.create(repo.findById(<span class="st">1</span>).flatMap(e -> <span class="ty">Mono</span>.error(<span class="kw">new</span> <span class="ty">IllegalStateException</span>())))
+            .verifyError(<span class="ty">IllegalStateException</span>.class);   <span class="cm">// onError, no una excepción lanzada</span>
+}</code></pre>
+  </div>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="p">$</span> <span class="cmd">./mvnw test</span>
+<span class="out ok">Tests run: 6, Failures: 0, Errors: 0, Skipped: 0</span>
+<span class="out ok">BUILD SUCCESS</span></code></pre>
+  </div>
+
+  <h3>Un test que protege la lección</h3>
+
+  <p>Hay un sexto test, y existe por un motivo que descubrimos rompiendo el código a propósito: si alguien borra el <code>.delayElement(LATENCIA)</code> del repositorio, <strong>el experimento de la §08 deja de mostrar diferencia</strong> y el proyecto pierde el sentido… pero los otros cinco tests siguen en verde. Este lo caza:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="kw">@Test</span>
+<span class="kw">void</span> tardaLoQueDebeTardar() {
+    <span class="ty">StepVerifier</span>.withVirtualTime(() -> repo.findById(<span class="st">1</span>))
+            .expectSubscription()
+            .expectNoEvent(<span class="ty">EmployeeRepository</span>.LATENCIA)   <span class="cm">// 5 segundos de SILENCIO</span>
+            .assertNext(e -> assertEquals(<span class="st">"Leslie"</span>, e.firstName()))
+            .verifyComplete();
+}</code></pre>
+  </div>
+
+  <p><code>expectNoEvent(d)</code> comprueba que durante ese tiempo <strong>no llega ninguna señal</strong>. Es la forma de testear que algo tarda, sin esperar de verdad.</p>
+
+  <p class="note warn"><strong>Y un detalle que evita perder una tarde.</strong> Un <code>StepVerifier</code> que espera una señal que nunca llega se queda colgado <strong>para siempre</strong>, no falla. En este proyecto lo comprobamos rompiendo la cadencia a propósito: la suite se colgó ocho minutos hasta que la matamos. Con una línea deja de pasar — y los mismos tests fallan en 15 segundos en vez de colgarse:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="kw">@BeforeAll</span>
+<span class="kw">static void</span> noColgarseNunca() {
+    <span class="ty">StepVerifier</span>.setDefaultTimeout(<span class="ty">EmployeeRepository</span>.LATENCIA.plusSeconds(<span class="st">10</span>));
+}</code></pre>
+  </div>
+
+  <p class="note warn"><strong><code>.block()</code> solo en tests y en <code>main()</code>.</strong> Dentro de un <code>@RestController</code> de WebFlux bloquea un hilo del <em>event loop</em> — y ya sabes lo que eso significa. Reactor lo detecta y lanza <code>IllegalStateException: block()/blockFirst()/blockLast() are blocking, which is not supported in thread reactor-http-nio-2</code>. Cuando veas ese mensaje, no lo silencies: te está salvando.</p>
+</section>
+
+<section id="laboratorio">
+  <p class="rubric">El experimento</p>
+  <h2 class="sec"><span class="num">08</span> Ahora sí: la diferencia</h2>
+
+  <p>Todo lo anterior se veía igual que el proyecto 15. Vamos a hacer que deje de verse igual.</p>
+
+  <p>En la misma aplicación hay un segundo controlador. Es el código del proyecto 15, <strong>copiado tal cual</strong>, dentro de una app WebFlux:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+    <span class="lbl">rest/BloqueanteRestController.java — LO QUE NO HAY QUE HACER</span>
+<pre><code><span class="kw">@RestController</span>
+<span class="kw">@RequestMapping</span>(<span class="st">"/api/mvc"</span>)
+<span class="kw">public class</span> <span class="ty">BloqueanteRestController</span> {
+
+    <span class="kw">@GetMapping</span>(<span class="st">"/employees/{id}"</span>)
+    <span class="kw">public</span> <span class="ty">Employee</span> findByIdBloqueante(<span class="kw">@PathVariable</span> <span class="kw">int</span> id) {
+        <span class="kw">return</span> repo.findByIdBloqueante(id);   <span class="cm">// Thread.sleep() sobre el event loop</span>
+    }
+}</code></pre>
+  </div>
+
+  <p>Compila. Arranca. Devuelve el mismo JSON. Y tarda los mismos 5 segundos si haces <strong>una</strong> petición. Ahora hazle 100 a la vez:</p>
+
+  <div class="term">
+    <button class="copy" type="button">Copiar</button>
+<pre><code><span class="p">$</span> <span class="cmd">./scripts/comparar.sh 100</span>
+
+<span class="out">  Tu maquina tiene 10 nucleos, asi que el event loop de Netty tiene</span>
+<span class="out">  ~10 hilos. Lanzamos 100 peticiones CONCURRENTES a cada ruta.</span>
+
+<span class="out">  Prediccion antes de correrlo:</span>
+<span class="out">    reactivo    -> ~5.0s   (ningun hilo espera: las 100 se solapan)</span>
+<span class="out">    bloqueante  -> ~50.00s   (100 peticiones / 10 hilos = 10.0 tandas de 5.0s)</span>
+
+<span class="out ok">  reactivo     100 peticiones en   5.13 s</span>
+<span class="out bad">  bloqueante   100 peticiones en  50.13 s</span></code></pre>
+  </div>
+
+  <div class="ver">
+    <b>Qué deberías ver</b>
+    <p>El reactivo tarda <strong>lo mismo que una sola petición</strong> — porque las 100 se solapan. El bloqueante tarda unas <strong>10 veces más</strong>, y el número no es magia: es <code>100 peticiones ÷ 10 hilos × 5 s</code>. Si tu máquina tiene 4 núcleos te saldrá peor; si tiene 16, mejor. <strong>Predice tu número antes de correrlo</strong> y comprueba que cuadra.</p>
+  </div>
+
+  <h3>Qué demuestra exactamente (y qué no)</h3>
+
+  <ul class="plain">
+    <li><strong>No demuestra que “reactivo sea rápido”.</strong> Las dos rutas tardan 5 segundos en el dato, y una sola petición tarda igual en las dos. Reactivo no acelera nada.</li>
+    <li><strong>Demuestra que el bloqueante desperdicia.</strong> Duerme sus 10 hilos y por eso las peticiones hacen cola. El reactivo los suelta y no encola. La métrica que mejora es el <strong>throughput</strong>, no la latencia — justo lo que el anexo de erratas señala como impreciso en el mapa mental.</li>
+    <li><strong>Y demuestra la trampa del §07 de la guía de conceptos.</strong> Ese controlador bloqueante no es un ejemplo rebuscado: es lo que pasa si migras a WebFlux y dejas el repositorio con JPA/JDBC. Habrás cambiado los 200 hilos de Tomcat por 10 de Netty, y los bloqueas igual. <strong>Quedas peor que antes de migrar.</strong></li>
+  </ul>
+
+  <p class="note key"><strong>La conclusión que se llevan a casa.</strong> WebFlux no es un interruptor que se enciende cambiando el tipo de retorno. O <strong>toda</strong> la pila es no bloqueante — repositorio incluido— o no sirve de nada. Por eso existen R2DBC y los drivers reactivos de MongoDB: sin ellos, un <code>Mono</code> es solo un <code>Employee</code> con más letras.</p>
+</section>
+
+<section id="errores">
+  <p class="rubric">Referencia</p>
+  <h2 class="sec">Si algo falla</h2>
+
+  <div class="trap">
+    <span class="k">01</span>
+    <span><b>“Web server failed to start. Port 8074 was already in use”</b>Tienes otra app viva. <code>lsof -i :8074</code> para ver quién, o cambia <code>server.port</code>.</span>
+  </div>
+  <div class="trap">
+    <span class="k">02</span>
+    <span><b>Arranca con <code>Tomcat started</code> en vez de <code>Netty started</code></b>Te colaste de starter: tienes <code>spring-boot-starter-webmvc</code> en el <code>pom.xml</code>. Si están los dos, gana MVC y WebFlux queda desactivado.</span>
+  </div>
+  <div class="trap">
+    <span class="k">03</span>
+    <span><b><code>cannot find symbol: com.fasterxml.jackson…</code></b>Boot 4 trae Jackson&nbsp;3, cuyo paquete es <code>tools.jackson.core</code>. Ese import solo aparece si copiaste configuración de un tutorial de Boot 3.</span>
+  </div>
+  <div class="trap">
+    <span class="k">04</span>
+    <span><b>El endpoint devuelve <code>200</code> con cuerpo vacío en vez de <code>404</code></b>No es un bug: es la §04. Un <code>Mono</code> vacío es un final feliz. Añade <code>switchIfEmpty()</code>.</span>
+  </div>
+  <div class="trap">
+    <span class="k">05</span>
+    <span><b><code>IllegalStateException: block()… not supported in thread reactor-http-nio-N</code></b>Llamaste a <code>.block()</code> dentro de un controlador. Devuelve el <code>Mono</code> y deja que Spring se suscriba.</span>
+  </div>
+  <div class="trap">
+    <span class="k">06</span>
+    <span><b>El test pasa pero no comprueba nada</b>¿Te suscribiste? Un <code>Mono</code> construido y nunca suscrito no ejecuta su contenido, así que un <code>assert</code> sobre sus efectos siempre falla en silencio. Usa <code>StepVerifier</code>.</span>
+  </div>
+
+  <p class="note"><strong>Si trabajas en Windows.</strong> Usa <code>mvnw.cmd spring-boot:run</code> en lugar de <code>./mvnw</code>. Los <code>.sh</code> de <code>scripts/</code> necesitan <strong>Git Bash</strong> o <strong>WSL</strong>; en PowerShell, <code>curl</code> es un alias de <code>Invoke-WebRequest</code> y se comporta distinto — usa <code>curl.exe</code> explícitamente.</p>
+</section>
+
+<section id="ejercicios">
+  <p class="rubric">Referencia</p>
+  <h2 class="sec">Ejercicios</h2>
+
+  <ul class="check">
+    <li><span class="box">1</span><span><b>Predice antes de medir</b> Mira cuántos núcleos tiene tu máquina y calcula qué va a tardar <code>./scripts/comparar.sh 200</code> en la ruta bloqueante. Después córrelo. ¿Cuadró?</span></li>
+    <li><span class="box">2</span><span><b>Rompe el reactivo</b> Mete un <code>Thread.sleep(5000)</code> <em>dentro</em> del <code>map()</code> del controlador reactivo — sin tocar el tipo de retorno, que sigue siendo <code>Mono</code>. Vuelve a medir. ¿Sigue siendo reactivo? Esta es la trampa más cara del tema.</span></li>
+    <li><span class="box">3</span><span><b>Arréglalo</b> Ahora aísla ese bloqueo con <code>.subscribeOn(Schedulers.boundedElastic())</code> y mide otra vez. ¿Qué cambió y por qué?</span></li>
+    <li><span class="box">4</span><span><b>404 sin excepción</b> Consigue que <code>/api/employees-suave/999</code> devuelva <code>404</code> sin lanzar ninguna excepción. Pista: <code>defaultIfEmpty</code> no sirve; mira <code>ResponseEntity</code>.</span></li>
+    <li><span class="box">5</span><span><b>Reintentos</b> Haz que el endpoint <code>/boom</code> reintente tres veces con espera creciente antes de rendirse, usando <code>retryWhen(Retry.backoff(3, Duration.ofMillis(200)))</code>. Añade un <code>doOnError</code> para ver los intentos en el log.</span></li>
+    <li><span class="box">6</span><span><b>El puente</b> Escribe un test que demuestre que <code>Mono.just(cargar())</code> ejecuta <code>cargar()</code> de inmediato, mientras que <code>Mono.defer(() -> Mono.just(cargar()))</code> espera a la suscripción. Es la trampa 06 de la guía de conceptos.</span></li>
+  </ul>
+
+  <p class="closing">Laboratorio 01 de 02 &middot; Proyecto <strong>springWebFlux</strong> &middot; Academy MTY. Continúa en <a href="https://claude.ai/code/artifact/4eae07f8-6023-49d3-b132-d52de9b79fb2"><strong>Muchos datos, uno a uno</strong></a>, donde la diferencia por fin se ve sin cronómetro. Conceptos en <a href="https://claude.ai/code/artifact/f9233b9b-b0ca-4382-8c96-80f64b66c173">Pensar en flujos</a>.</p>
+</section>
+
+</main>
+</div>
+
+<script>
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var pre = btn.parentElement.querySelector('pre');
+    if (!pre) return;
+    navigator.clipboard.writeText(pre.innerText).then(function () {
+      var prev = btn.textContent;
+      btn.textContent = 'Copiado';
+      setTimeout(function () { btn.textContent = prev; }, 1400);
+    }).catch(function () { btn.textContent = 'Error'; });
+  });
+});
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+  var map = {};
+  links.forEach(function (a) {
+    var el = document.getElementById(a.getAttribute('href').slice(1));
+    if (el) map[el.id] = a;
+  });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!map[e.target.id]) return;
+      if (e.isIntersecting) {
+        links.forEach(function (a) { a.classList.remove('cur'); });
+        map[e.target.id].classList.add('cur');
+      }
+    });
+  }, { rootMargin: '-10% 0px -75% 0px', threshold: 0 });
+  Object.keys(map).forEach(function (id) { obs.observe(document.getElementById(id)); });
+})();
+</script>
