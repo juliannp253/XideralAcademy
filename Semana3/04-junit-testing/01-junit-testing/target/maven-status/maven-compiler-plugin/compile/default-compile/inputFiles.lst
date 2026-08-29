@@ -1,0 +1,10 @@
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/04-junit-testing/01-junit-testing/src/main/java/com/academymty/testing/exception/CursoCerradoException.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/04-junit-testing/01-junit-testing/src/main/java/com/academymty/testing/exception/CursoLlenoException.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/04-junit-testing/01-junit-testing/src/main/java/com/academymty/testing/model/Alumno.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/04-junit-testing/01-junit-testing/src/main/java/com/academymty/testing/model/Boleta.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/04-junit-testing/01-junit-testing/src/main/java/com/academymty/testing/model/Curso.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/04-junit-testing/01-junit-testing/src/main/java/com/academymty/testing/model/InscripcionResultado.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/04-junit-testing/01-junit-testing/src/main/java/com/academymty/testing/repository/AlumnoRepository.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/04-junit-testing/01-junit-testing/src/main/java/com/academymty/testing/service/InscripcionService.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/04-junit-testing/01-junit-testing/src/main/java/com/academymty/testing/service/NotificacionService.java
+/mnt/almacen/MiRespaldo/AcademyXideral/Semana3/04-junit-testing/01-junit-testing/src/main/java/com/academymty/testing/util/ValidadorCurp.java

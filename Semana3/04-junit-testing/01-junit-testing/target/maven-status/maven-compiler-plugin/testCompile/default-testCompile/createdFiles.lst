@@ -1,0 +1,13 @@
+com/academymty/testing/CursoTest$CuandoElCursoEstaLleno.class
+com/academymty/testing/CursoTest$EstadosDeUnTest.class
+com/academymty/testing/BoletaTest$PruebasDeFrontera.class
+com/academymty/testing/CursoTest$CuandoElCursoEstaCerrado.class
+com/academymty/testing/CursoTest.class
+com/academymty/testing/InscripcionServiceTest.class
+com/academymty/testing/InscripcionServiceTest$CasosDeExito.class
+com/academymty/testing/InscripcionServiceTest$PruebasConArgumentCaptor.class
+com/academymty/testing/BoletaTest.class
+com/academymty/testing/CursoTest$CuandoTieneCupoDisponible.class
+com/academymty/testing/ValidadorCurpTest.class
+com/academymty/testing/InscripcionServiceTest$CasosDeError.class
+com/academymty/testing/CursoTest$PruebasDeTiempo.class
